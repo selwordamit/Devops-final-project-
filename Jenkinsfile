@@ -36,21 +36,32 @@ pipeline {
         stage('Deploy JSP to Tomcat') {
             steps {
                 bat '''
-@echo off
+@echo on
+echo === DEBUG START ===
+echo WORKSPACE=%WORKSPACE%
 echo SRC=%SRC%
 echo DST=%DST%
 
+echo --- Listing source folder ---
+dir "%WORKSPACE%\\adamliadadiramityuri"
+
+echo --- Checking source file exists ---
 if not exist "%SRC%" (
-    echo ERROR: source file not found: %SRC%
-    dir /s /b "%WORKSPACE%\\index.jsp"
-    exit /b 1
+  echo ERROR: source file not found: %SRC%
+  exit /b 1
 )
 
+echo --- Checking destination folder exists ---
+dir "C:\\Program Files\\Apache Software Foundation\\Tomcat 8.5\\webapps\\Devops-final-project-\\adamliadadiramityuri"
+
+echo --- Copying file ---
 copy /Y "%SRC%" "%DST%"
+echo COPY_EXIT_CODE=%ERRORLEVEL%
 if errorlevel 1 exit /b 1
 
-echo DONE
+echo === DEBUG END ===
 '''
+
             }
         }
 
