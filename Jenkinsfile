@@ -53,11 +53,11 @@ pipeline {
             echo 'Pipeline execution finished.'
         }
         success {
-            echo 'Deployment and Health Check completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
             echo 'Pipeline failed. Check the logs above for errors.'
-            // Future step: Add Discord/Slack notification here
+            
         }
     }
 }
