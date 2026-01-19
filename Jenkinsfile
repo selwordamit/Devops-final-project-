@@ -1,4 +1,6 @@
-pipeline {
+//     ---PowerShell Pipeline Do not Delete--- 
+
+/*pipeline {
     agent any
 
     triggers {
@@ -58,6 +60,72 @@ pipeline {
         failure {
             echo 'Pipeline failed. Check the logs above for errors.'
             
+        }
+    }
+}
+*/
+
+
+
+
+// ----Linux Pipeline----
+
+pipeline {
+    agent any
+
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        // Linux path for Tomcat 9 webapps
+        TOMCAT_WEBAPP = "/var/lib/tomcat9/webapps/Devops-final-project-/adamliadadiramityuri"
+        // The URL to check
+        APP_URL = "http://localhost:8081/Devops-final-project-/adamliadadiramityuri/"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code from GitHub...'
+            }
+        }
+
+        stage('Prepare Directory') {
+            steps {
+                // Ensure the target directory exists on Linux
+                sh "sudo mkdir -p ${TOMCAT_WEBAPP}"
+            }
+        }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                echo "Copying index.jsp to Tomcat..."
+                // Using Linux 'cp' command
+                sh "sudo cp adamliadadiramityuri/index.jsp ${TOMCAT_WEBAPP}/index.jsp"
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo "Verifying deployment status at ${APP_URL}"
+                // Using 'curl' to check the HTTP status code on Linux
+                sh """
+                STATUS=\$(curl -s -o /dev/null -w "%{http_code}" ${APP_URL})
+                if [ \$STATUS -ge 200 ] && [ \$STATUS -lt 400 ]; then
+                    echo "Health Check Passed: Status \$STATUS"
+                else
+                    echo "Health Check Failed: Status \$STATUS"
+                    exit 1
+                fi
+                """
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Pipeline failed. Check the logs for errors.'
         }
     }
 }
