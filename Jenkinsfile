@@ -128,7 +128,7 @@ pipeline {
                             echo "✅ UptimeRobot confirms: Application is UP and publicly accessible"
                         } else {
                             // If status is not 2, we force the pipeline to fail (Requirement #6)
-                            error("❌ UptimeRobot Alert: Application is reported as DOWN by external monitor!")
+                            error("❌ UptimeRobot Alert: Application is reported as DOWN")
                         }
                     }
                 }
