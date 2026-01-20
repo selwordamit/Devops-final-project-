@@ -75,60 +75,65 @@
 pipeline {
     agent any
 
-    // Project Requirement: Trigger the job every 5 minutes (Requirement #6)
     triggers {
+        // Polls GitHub for code changes every 5 minutes
         pollSCM('H/5 * * * *')
+        // Force-runs the pipeline every 5 minutes for health monitoring (CRON)
+        cron('H/5 * * * *')
     }
 
     environment {
-        // Defined the specific path under Tomcat webapps including the team names (Requirement #3)
         TOMCAT_WEBAPP = "/var/lib/tomcat9/webapps/Devops-final-project-/adamliadadiramityuri"
+        // Target URL for monitoring
+        APP_URL = "http://4.178.56.71:8081/Devops-final-project-/adamliadadiramityuri/"
     }
 
     stages {
         stage('Initialize') {
             steps {
-                echo "✅ STARTING DEPLOYMENT PROCESS"
-                // Log the current server time for traceability
-                echo "Current Time: ${sh(script: 'date', returnStdout: true).trim()}"
+                echo "✅ STARTING PROCESS"
+                // Log server time for audit trail
+                echo "Current Server Time: ${sh(script: 'date', returnStdout: true).trim()}"
             }
         }
 
         stage('Checkout') {
             steps {
-                echo "✅ Fetching latest source code from GitHub repository"
-                // Jenkins automatically performs 'git checkout' based on the job configuration
+                echo "✅ Fetching latest source code from GitHub"
+                // SCM checkout is handled automatically by Jenkins job configuration
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo "✅ Deploying index.jsp to production environment (Tomcat)"
-                // Overwrites the existing JSP file in the webapps directory (Requirement #4)
+                echo "✅ Deploying index.jsp to production (Requirement #4)"
+                // Copy the file to the Tomcat directory on the Azure Linux VM
                 sh "cp adamliadadiramityuri/index.jsp ${TOMCAT_WEBAPP}/index.jsp"
             }
         }
 
         stage('External Monitoring Status') {
             steps {
-                echo "✅ Querying UptimeRobot API for external application status"
+                echo "🔍 Querying UptimeRobot API for Status & Performance Graphs (Requirement #6)"
                 
-                // Securely retrieving the API Key from Jenkins Credentials store to avoid hardcoding secrets
+                // Retrieving the API Key from Jenkins Credentials store for security
                 withCredentials([string(credentialsId: 'uptimerobot-api-key', variable: 'UPTIME_KEY')]) {
                     script {
-                        // Performing a POST request to UptimeRobot API to get current monitor status
-                        // Single quotes are used to prevent Groovy from touching the $ variables
+                        // Requesting monitor data from UptimeRobot via POST request
                         def response = sh(
-                            script: 'curl -X POST https://api.uptimerobot.com/v2/getMonitors -d "api_key=${UPTIME_KEY}&format=json" -s',
+                            script: "curl -X POST https://api.uptimerobot.com/v2/getMonitors -d 'api_key=${UPTIME_KEY}&format=json' -s",
                             returnStdout: true
                         )
                         
-                        // In UptimeRobot API, "status": 2 means the site is UP/Online
+                        // status 2 in UptimeRobot indicates the site is UP
                         if (response.contains('"status":2')) {
-                            echo "✅ UptimeRobot confirms: Application is UP and publicly accessible"
+                            echo "-------------------------------------------------------"
+                            echo "✅MONITOR STATUS: ONLINE"
+                            echo "Performance metrics are being logged to UptimeRobot"
+                            echo "-------------------------------------------------------"
                         } else {
-                            // If status is not 2, we force the pipeline to fail (Requirement #6)
-                            error("❌ UptimeRobot Alert: Application is reported as DOWN")
+                            // Failing the build if the external monitor reports an issue
+                            error("❌ MONITOR ALERT: Application is reported as DOWN by UptimeRobot")
                         }
                     }
                 }
@@ -136,13 +141,12 @@ pipeline {
         }
     }
 
-    // Post-execution actions to report the final build status
     post {
         success {
-            echo "✅ Pipeline finished successfully - All requirements for this stage met"
+            echo "✅ Success"
         }
         failure {
-            echo "❌ Pipeline failed - Check the deployment or the external monitor status"
+            echo "❌ Failure
         }
     }
 }
