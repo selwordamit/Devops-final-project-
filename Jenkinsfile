@@ -91,7 +91,7 @@ pipeline {
         stage('Initialize') {
             steps {
                 echo "-------------------------------------------------------"
-                echo "🚀 STARTING DEPLOYMENT PROCESS"
+                echo "STARTING DEPLOYMENT PROCESS"
                 echo "Target Server: Azure Linux VM"
                 echo "Time: ${sh(script: 'date', returnStdout: true).trim()}"
                 echo "-------------------------------------------------------"
@@ -100,7 +100,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo "📥 Fetching latest code from GitHub..."
+                echo "Fetching latest code from GitHub..."
                 // Jenkins handles the Git checkout automatically via SCM settings
                 echo "Successfully synchronized with repository."
             }
@@ -108,7 +108,7 @@ pipeline {
 
         stage('Prepare Directory') {
             steps {
-                echo "📁 Verifying target directory structure..."
+                echo "Verifying target directory structure..."
                 // Create directory if it doesn't exist (no sudo needed if permissions are set)
                 sh "mkdir -p ${TOMCAT_WEBAPP}"
                 echo "Directory is ready: ${TOMCAT_WEBAPP}"
@@ -126,35 +126,30 @@ pipeline {
                 echo "✅ File successfully copied to webapps."
             }
         }
-
-        stage('Health Check') {
-            steps {
-                echo "🔍 Initiating Health Check for: ${APP_URL}"
-                // Perform a curl request and capture the status code
-                sh """
-                    STATUS=\$(curl -s -o /dev/null -w "%{http_code}" ${APP_URL})
-                    echo "Response Code Received: \$STATUS"
-                    
-                    if [ \$STATUS -ge 200 ] && [ \$STATUS -lt 400 ]; then
-                        echo "-------------------------------------------------------"
-                        echo "🟢 MONITORING STATUS: SUCCESS"
-                        echo "Application is UP and responding correctly."
-                        echo "-------------------------------------------------------"
-                    else
-                        echo "-------------------------------------------------------"
-                        echo "🔴 MONITORING STATUS: FAILED"
-                        echo "Application is DOWN or returning an error."
-                        echo "-------------------------------------------------------"
-                        exit 1
-                    fi
-                """
+stage('Uptime Robot Monitoring Status') {
+    steps {
+        echo "Checking Application Status from UptimeRobot..."
+        // Uses the credetinals created in jenkins
+        withCredentials([string(credentialsId: 'uptimerobot-api-key', variable: 'UPTIME_KEY')]) {
+            script {
+                def response = sh(
+                    script: "curl -X POST https://api.uptimerobot.com/v2/getMonitors -d 'api_key=${UPTIME_KEY}&format=json' -s",
+                    returnStdout: true
+                )
+                
+                if (response.contains('"status":2')) {
+                    echo "✅ UptimeRobot confirms: Site is UP"
+                } else {
+                    echo "⚠️ UptimeRobot status: Site might be DOWN or Warning"
+                }
             }
         }
     }
+}
 
     post {
         success {
-            echo "✨ Pipeline finished successfully! Great job team."
+            echo "Pipeline finished successfully! Great job team."
         }
         failure {
             echo "❌ Pipeline failed! Review the logs above to identify the issue."
