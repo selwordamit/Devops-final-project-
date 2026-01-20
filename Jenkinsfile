@@ -144,9 +144,9 @@ pipeline {
                         )
                         
                         if (response.contains('"status":2')) {
-                            echo "✅ UptimeRobot confirms: Application is UP"
+                            echo "✅ UptimeRobot status: Application is UP"
                         } else {
-                            echo "⚠️ UptimeRobot status: Application is not reporting as UP"
+                            echo "❌ UptimeRobot status: Application is DOWN or Unreachable"
                         }
                     }
                 }
