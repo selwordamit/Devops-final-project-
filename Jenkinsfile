@@ -1,6 +1,6 @@
 //     ---PowerShell Pipeline Do not Delete--- 
 
-/*pipeline {
+pipeline {
     agent any
 
     triggers {
@@ -63,13 +63,13 @@
         }
     }
 }
-*/
+
 
 
 
 
 // ----Linux Pipeline----
-
+/*
 pipeline {
     agent any
 
@@ -162,3 +162,4 @@ pipeline {
         }
     }
 }
+*/
