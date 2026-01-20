@@ -75,78 +75,60 @@
 pipeline {
     agent any
 
+    // Project Requirement: Trigger the job every 5 minutes (Requirement #6)
     triggers {
-        // Check for GitHub changes every 5 minutes
         pollSCM('H/5 * * * *')
     }
 
     environment {
-        // Path to the project folder inside Tomcat webapps on Azure Linux VM
+        // Defined the specific path under Tomcat webapps including the team names (Requirement #3)
         TOMCAT_WEBAPP = "/var/lib/tomcat9/webapps/Devops-final-project-/adamliadadiramityuri"
-        // Internal application URL for health monitoring
-        APP_URL = "http://localhost:8081/Devops-final-project-/adamliadadiramityuri/"
     }
 
     stages {
         stage('Initialize') {
             steps {
                 echo "✅ STARTING DEPLOYMENT PROCESS"
-                echo "Time: ${sh(script: 'date', returnStdout: true).trim()}"
+                // Log the current server time for traceability
+                echo "Current Time: ${sh(script: 'date', returnStdout: true).trim()}"
             }
         }
 
         stage('Checkout') {
             steps {
-                echo "✅ Fetching latest code from GitHub"
-                // SCM checkout is handled automatically by Jenkins
-            }
-        }
-
-        stage('Prepare Directory') {
-            steps {
-                echo "✅ Verifying target directory structure"
-                sh "mkdir -p ${TOMCAT_WEBAPP}"
+                echo "✅ Fetching latest source code from GitHub repository"
+                // Jenkins automatically performs 'git checkout' based on the job configuration
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo "✅ Deploying index.jsp to Tomcat web server"
-                // Copy the file to the specific folder including the team names
+                echo "✅ Deploying index.jsp to production environment (Tomcat)"
+                // Overwrites the existing JSP file in the webapps directory (Requirement #4)
                 sh "cp adamliadadiramityuri/index.jsp ${TOMCAT_WEBAPP}/index.jsp"
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                echo "✅ Initiating Internal Health Check for: ${APP_URL}"
-                sh """
-                    STATUS=\$(curl -s -o /dev/null -w "%{http_code}" ${APP_URL})
-                    if [ \$STATUS -ge 200 ] && [ \$STATUS -lt 400 ]; then
-                        echo "✅ Internal Status: SUCCESS"
-                    else
-                        echo "❌ Internal Status: FAILED (Status: \$STATUS)"
-                        exit 1
-                    fi
-                """
             }
         }
 
         stage('External Monitoring Status') {
             steps {
-                echo "✅ Checking UptimeRobot status"
-                // Using the Secret Text credential created in Jenkins
+                echo "✅ Querying UptimeRobot API for external application status"
+                
+                // Securely retrieving the API Key from Jenkins Credentials store to avoid hardcoding secrets
                 withCredentials([string(credentialsId: 'uptimerobot-api-key', variable: 'UPTIME_KEY')]) {
                     script {
+                        // Performing a POST request to UptimeRobot API to get current monitor status
+                        // Single quotes are used to prevent Groovy from touching the $ variables
                         def response = sh(
-                            script: "curl -X POST https://api.uptimerobot.com/v2/getMonitors -d 'api_key=${UPTIME_KEY}&format=json' -s",
+                            script: 'curl -X POST https://api.uptimerobot.com/v2/getMonitors -d "api_key=${UPTIME_KEY}&format=json" -s',
                             returnStdout: true
                         )
                         
+                        // In UptimeRobot API, "status": 2 means the site is UP/Online
                         if (response.contains('"status":2')) {
-                            echo "✅ UptimeRobot status: Application is UP"
+                            echo "✅ UptimeRobot confirms: Application is UP and publicly accessible"
                         } else {
-                            echo "❌ UptimeRobot status: Application is DOWN or Unreachable"
+                            // If status is not 2, we force the pipeline to fail (Requirement #6)
+                            error("❌ UptimeRobot Alert: Application is reported as DOWN by external monitor!")
                         }
                     }
                 }
@@ -154,12 +136,13 @@ pipeline {
         }
     }
 
+    // Post-execution actions to report the final build status
     post {
         success {
-            echo "✅ Pipeline finished successfully"
+            echo "✅ Pipeline finished successfully - All requirements for this stage met"
         }
         failure {
-            echo "❌ Pipeline failed - check the logs for syntax or permission errors"
+            echo "❌ Pipeline failed - Check the deployment or the external monitor status"
         }
     }
 }
