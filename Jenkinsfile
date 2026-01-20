@@ -1,6 +1,6 @@
 //     ---PowerShell Pipeline Do not Delete--- 
 
-pipeline {
+/*pipeline {
     agent any
 
     triggers {
@@ -49,6 +49,8 @@ pipeline {
             }
         }
     }
+    
+
 
     post {
         always {
@@ -65,11 +67,11 @@ pipeline {
 }
 
 
-
+*/
 
 
 // ----Linux Pipeline----
-/*
+
 pipeline {
     agent any
 
@@ -162,4 +164,3 @@ pipeline {
         }
     }
 }
-*/
