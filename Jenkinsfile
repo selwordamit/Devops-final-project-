@@ -76,15 +76,16 @@ pipeline {
     agent any
 
     triggers {
-        // Polls GitHub for code changes every 5 minutes
+        // Polls GitHub for changes every 5 minutes
         pollSCM('H/5 * * * *')
-        // Force-runs the pipeline every 5 minutes for health monitoring (CRON)
+        // Scheduled run every 5 minutes for monitoring
         cron('H/5 * * * *')
     }
 
     environment {
+        // Path to the application folder on the server
         TOMCAT_WEBAPP = "/var/lib/tomcat9/webapps/Devops-final-project-/adamliadadiramityuri"
-        // Target URL for monitoring
+        // Public address for the application
         APP_URL = "http://4.178.56.71:8081/Devops-final-project-/adamliadadiramityuri/"
     }
 
@@ -92,7 +93,7 @@ pipeline {
         stage('Initialize') {
             steps {
                 echo "✅ STARTING PROCESS"
-                // Log server time for audit trail
+                // Log the current system time
                 echo "Current Server Time: ${sh(script: 'date', returnStdout: true).trim()}"
             }
         }
@@ -100,40 +101,36 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo "✅ Fetching latest source code from GitHub"
-                // SCM checkout is handled automatically by Jenkins job configuration
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo "✅ Deploying index.jsp to production (Requirement #4)"
-                // Copy the file to the Tomcat directory on the Azure Linux VM
+                echo "✅ Deploying index.jsp to production"
+                // Copying the file to the target web directory
                 sh "cp adamliadadiramityuri/index.jsp ${TOMCAT_WEBAPP}/index.jsp"
             }
         }
 
         stage('External Monitoring Status') {
             steps {
-                echo "🔍 Querying UptimeRobot API for Status & Performance Graphs (Requirement #6)"
+                echo "✅ Querying UptimeRobot API for Status"
                 
-                // Retrieving the API Key from Jenkins Credentials store for security
+                // Using credentials store for the API Key
                 withCredentials([string(credentialsId: 'uptimerobot-api-key', variable: 'UPTIME_KEY')]) {
                     script {
-                        // Requesting monitor data from UptimeRobot via POST request
+                        // Securely calling the UptimeRobot API
                         def response = sh(
-                            script: "curl -X POST https://api.uptimerobot.com/v2/getMonitors -d 'api_key=${UPTIME_KEY}&format=json' -s",
+                            script: 'curl -X POST https://api.uptimerobot.com/v2/getMonitors -d "api_key=${UPTIME_KEY}&format=json" -s',
                             returnStdout: true
                         )
                         
-                        // status 2 in UptimeRobot indicates the site is UP
+                        // Validating if the monitor status is ONLINE (status 2)
                         if (response.contains('"status":2')) {
-                            echo "-------------------------------------------------------"
-                            echo "✅MONITOR STATUS: ONLINE"
-                            echo "Performance metrics are being logged to UptimeRobot"
-                            echo "-------------------------------------------------------"
+                            echo "✅ MONITOR STATUS: ONLINE"
                         } else {
-                            // Failing the build if the external monitor reports an issue
-                            error("❌ MONITOR ALERT: Application is reported as DOWN by UptimeRobot")
+                            // Failing the pipeline if the site is unreachable
+                            error("❌ MONITOR ALERT: Application is reported as DOWN")
                         }
                     }
                 }
@@ -146,7 +143,8 @@ pipeline {
             echo "✅ Success"
         }
         failure {
-            echo "❌ Failure
+            // Fixed the syntax by closing the quotes properly
+            echo "❌ Failure"
         }
     }
 }
