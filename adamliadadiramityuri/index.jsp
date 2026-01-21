@@ -87,7 +87,7 @@
 
         <div class="container">
             <h1>DevOps Project</h1>
-            <h2>Welcome to our JSP App</h2>
+            <h2>Welcome to our JSP Ap</h2>
 
             <form method="post" class="form-group">
                 <input type="text" name="userText" placeholder="Type text here..." required />
