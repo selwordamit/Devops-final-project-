@@ -136,7 +136,8 @@ pipeline {
                     test -f selenium/test_page.side
 
                     # run selenium IDE .side via npx (no global install)
-                    npx --yes selenium-side-runner "selenium/test_page.side" --base-url "$APP_URL"
+                    export MOZ_HEADLESS=1
+                    npx --yes selenium-side-runner "selenium/test_page.side" --base-url "$APP_URL" --capabilities "browserName=firefox"
                 '''
             }
         }
