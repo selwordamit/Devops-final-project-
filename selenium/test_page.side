@@ -1,0 +1,95 @@
+{
+  "id": "7cf51140-f5a2-4e79-9d3f-e37b7188b5e0",
+  "version": "2.0",
+  "name": "Devops-tests",
+  "url": "http://4.178.56.71:8081/Devops-final-project-/",
+  "tests": [{
+    "id": "5693aa76-5299-4eca-9ce8-c47fb8d9cdc6",
+    "name": "test_page",
+    "commands": [{
+      "id": "6c5633ea-cbf8-48c8-ac84-149d36f4dd40",
+      "comment": "",
+      "command": "open",
+      "target": "adamliadadiramityuri/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f7635248-729b-4dd5-b28a-c3289fbb2e45",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=h1",
+      "targets": [
+        ["css=h1", "css:finder"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'DevOps Project')]", "xpath:innerText"]
+      ],
+      "value": "DevOps Project"
+    }, {
+      "id": "8a068226-7150-4ff6-a439-31387d46cc46",
+      "comment": "",
+      "command": "type",
+      "target": "name=userText",
+      "targets": [
+        ["name=userText", "name"],
+        ["css=input:nth-child(1)", "css:finder"],
+        ["xpath=//input[@name='userText']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "DevOpsProject"
+    }, {
+      "id": "34d8d41a-ba4e-40bb-a26d-71393ac8a745",
+      "comment": "",
+      "command": "assertValue",
+      "target": "name=userText",
+      "targets": [
+        ["name=userText", "name"],
+        ["css=input:nth-child(1)", "css:finder"],
+        ["xpath=//input[@name='userText']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "DevOpsProject"
+    }, {
+      "id": "85763b8a-b662-42e6-9f0d-92eeea0eeb20",
+      "comment": "",
+      "command": "click",
+      "target": "css=input:nth-child(2)",
+      "targets": [
+        ["css=input:nth-child(2)", "css:finder"],
+        ["xpath=//input[@value='Submit Data']", "xpath:attributes"],
+        ["xpath=//input[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0f0d56be-db77-406c-a52f-5f0064e2143e",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.result-box",
+      "targets": [
+        ["css=.result-box", "css:finder"],
+        ["xpath=//div[3]/div", "xpath:position"]
+      ],
+      "value": "You entered: DevOpsProject"
+    }, {
+      "id": "4ceb0397-565f-4672-b7d0-15097c2677d9",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=h2",
+      "targets": [
+        ["css=h2", "css:finder"],
+        ["xpath=//h2", "xpath:position"],
+        ["xpath=//h2[contains(.,'Welcome to our JSP Application')]", "xpath:innerText"]
+      ],
+      "value": "Welcome to our JSP Application"
+    }]
+  }],
+  "suites": [{
+    "id": "0e68df56-7fcb-4716-ba84-7f8008ebad59",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": []
+  }],
+  "urls": ["http://129.159.141.184:8080/", "http://4.178.56.71:8081/Devops-final-project-/"],
+  "plugins": []
+}
