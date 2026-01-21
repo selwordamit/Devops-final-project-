@@ -3,6 +3,10 @@
 /*pipeline {
     agent any
 
+    tools {
+        nodejs 'Node20'
+    }
+
     triggers {
         // Check for Git changes every 5 minutes (Poll SCM)
         pollSCM('H/5 * * * *')
@@ -75,6 +79,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'Node20'
+    }
+    
     triggers {
         // Polls GitHub for changes every 5 minutes
         pollSCM('H/5 * * * *')
