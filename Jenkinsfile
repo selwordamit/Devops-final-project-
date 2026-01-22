@@ -1,6 +1,6 @@
-//     ---PowerShell Pipeline Do not Delete--- 
-
-/*pipeline {
+//     --- PowerShell Pipeline (Windows) - Do not Delete --- 
+/*
+pipeline {
     agent any
 
     tools {
@@ -53,8 +53,6 @@
             }
         }
     }
-    
-
 
     post {
         always {
@@ -65,16 +63,12 @@
         }
         failure {
             echo 'Pipeline failed. Check the logs above for errors.'
-            
         }
     }
 }
-
-
 */
 
-
-// ----Linux Pipeline----
+// ---- Linux Pipeline (Current Production) ----
 
 pipeline {
     agent any
@@ -84,9 +78,8 @@ pipeline {
     }
     
     triggers {
-        // Polls GitHub for changes every 5 minutes
+        // Requirement 6: Polls GitHub for changes and runs every 5 minutes
         pollSCM('H/5 * * * *')
-        // Scheduled run every 5 minutes for monitoring
         cron('H/5 * * * *')
     }
 
@@ -119,20 +112,9 @@ pipeline {
             }
         }
 
-        stage('Selenium Tests') {
-            steps {
-                echo "✅ Running Selenium UI tests"
-                sh '''
-                    set -e
-                    export MOZ_HEADLESS=1
-                    npx --yes selenium-side-runner "selenium/test_page.side" --base-url "$APP_URL" --capabilities "browserName=firefox"
-                '''
-            }
-        }
-
         stage('External Monitoring Status') {
             steps {
-                echo "✅ Querying UptimeRobot API for Status"
+                echo "✅ Requirement 6: Querying UptimeRobot API for Status"
                 withCredentials([string(credentialsId: 'uptimerobot-api-key', variable: 'UPTIME_KEY')]) {
                     script {
                         def response = sh(
@@ -150,17 +132,40 @@ pipeline {
             }
         }
 
-        stage('Load Test (Gatling)') {
-            steps {
-                echo "✅ Starting Load Test (Gatling)"
-                sh 'mvn gatling:test -Dgatling.simulationClass=Load3Min -Dgatling.jvmArgs="-Xmx128m"'
+        // --- Heavy Testing Block ---
+        // These stages run ONLY on Code Change or Manual Build to prevent server crash loops
+        stage('Automated Quality Tests') {
+            when {
+                anyOf {
+                    cause 'UserIdCause'
+                    cause 'SCMTriggerCause'
+                }
             }
-        }
+            stages {
+                stage('Selenium Tests') {
+                    steps {
+                        echo "✅ Running Selenium UI tests"
+                        sh '''
+                            set -e
+                            export MOZ_HEADLESS=1
+                            npx --yes selenium-side-runner "selenium/test_page.side" --base-url "$APP_URL" --capabilities "browserName=firefox"
+                        '''
+                    }
+                }
 
-        stage('Stress Test (Gatling)') {
-            steps {
-                echo "✅ Starting Stress Test (Gatling)"
-                sh 'mvn gatling:test -Dgatling.simulationClass=Stress3Min -Dgatling.jvmArgs="-Xmx128m"'
+                stage('Load Test (Gatling)') {
+                    steps {
+                        echo "✅ Starting Load Test (Gatling)"
+                        sh 'mvn gatling:test -Dgatling.simulationClass=Load3Min -Dgatling.jvmArgs="-Xmx128m"'
+                    }
+                }
+
+                stage('Stress Test (Gatling)') {
+                    steps {
+                        echo "✅ Starting Stress Test (Gatling)"
+                        sh 'mvn gatling:test -Dgatling.simulationClass=Stress3Min -Dgatling.jvmArgs="-Xmx128m"'
+                    }
+                }
             }
         }
     }
