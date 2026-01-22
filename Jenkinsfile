@@ -136,10 +136,7 @@ pipeline {
         // These stages run ONLY on Code Change or Manual Build to prevent server crash loops
         stage('Automated Quality Tests') {
             when {
-                anyOf {
-                    cause 'UserIdCause'
-                    cause 'SCMTriggerCause'
-                }
+                not { triggeredBy 'TimerTrigger' }
             }
             stages {
                 stage('Selenium Tests') {
