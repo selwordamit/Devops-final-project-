@@ -168,6 +168,9 @@ pipeline {
     post {
         success {
             echo "✅ Pipeline completed successfully"
+            // For gatling graphs 
+            // TODO add "Gatling Check Results" in Jenkins plugins for graphs to show
+            gatlingArchive()
         }
         failure {
             echo "❌ Pipeline failed"
