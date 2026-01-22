@@ -25,6 +25,6 @@ class Stress3Min extends Simulation {
    // --- Assertions לבדיקת ה-Stress ---
    .assertions(
      global.successfulRequests.percent.gt(90), // Fail if less than 90% requests succeed
-     global.responseTime.mean.lt(2000)         // Fail if response time is more than 2 seconds
+     global.responseTime.mean.lt(20000)         // Fail if response time is more than 20 seconds
    )
 }

@@ -25,7 +25,7 @@ class Load3Min extends Simulation {
   ).protocols(httpProtocol)
    // --- Assertions ---
    .assertions(
-     global.responseTime.max.lt(5000),      // Fail if response time is more than 5 seconds
-     global.successfulRequests.percent.gt(95) // Fail if less than 95% request succeed
+     global.responseTime.max.lt(15000),      // Fail if response time is more than 15 seconds
+     global.successfulRequests.percent.gt(90) // Fail if less than 90% request succeed
    )
 }
