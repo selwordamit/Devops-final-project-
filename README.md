@@ -1,69 +1,122 @@
-# Devops-final-project-
+# DevOps Final Project: JSP Application & CI/CD Pipeline
 
-DevOps Final Project: JSP Application & CI/CD Pipeline
-This project demonstrates a complete CI/CD pipeline implementation for a Java Server Pages (JSP) web application, utilizing modern DevOps tools for automation, performance testing, and continuous monitoring.
+This project demonstrates a complete **CI/CD pipeline implementation** for a **Java Server Pages (JSP)** web application, utilizing modern DevOps tools for automation, performance testing, and continuous monitoring.
 
-🚀 Project Overview
-The application is a simple JSP-based web interface that allows users to submit text and view the results. The infrastructure is designed to be fully automated, deploying to an Apache Tomcat 9 server on a Linux environment via a Jenkins Pipeline.
+---
 
-🛠 Technologies & Tools
-Web Server: Apache Tomcat 9.
+## 🚀 Project Overview
 
-CI/CD Engine: Jenkins (Declarative Pipeline).
+The application is a simple **JSP-based web interface** that allows users to submit text and view processed results.  
+The infrastructure is fully automated, deploying to an **Apache Tomcat 9** server on a **Linux environment** via a **Jenkins Declarative Pipeline**.
 
-Build Tool: Maven.
+**Workflow:**  
+`GitHub → Jenkins → Apache Tomcat → Monitoring & Testing`
 
-Testing Suite:
+---
 
-Selenium IDE: Automated UI and functional validations.
+## 🛠 Technologies & Tools
 
-Gatling (Scala): High-performance Load and Stress testing.
+**Web Server:** Apache Tomcat 9  
+**CI/CD Engine:** Jenkins (Declarative Pipeline)  
+**Build Tool:** Maven  
 
-Monitoring: UptimeRobot API integration for availability tracking.
+**Testing Suite:**
+- **Selenium IDE** – Automated UI & functional validations  
+- **Gatling (Scala)** – Load & stress testing  
 
-🏗 Pipeline Architecture
-The Jenkinsfile defines a multi-stage lifecycle to ensure code quality and deployment stability:
+**Monitoring:**
+- **UptimeRobot API** – Public endpoint availability tracking  
 
-Initialize & Checkout: Verifies the environment and fetches the latest source code from GitHub.
+---
 
-Deploy to Tomcat: Automatically deploys the index.jsp file to the production directory: /var/lib/tomcat9/webapps/.
+## 🏗 Pipeline Architecture
 
-External Monitoring Status: Queries the UptimeRobot API to ensure the public endpoint is reachable.
+The `Jenkinsfile` defines a multi-stage lifecycle ensuring code quality and deployment stability:
 
-Automated Quality Tests: A conditional block that skips heavy testing during routine 5-minute cron checks but runs during SCM changes or manual triggers:
+1. **Initialize & Checkout**  
+   Verifies environment and fetches the latest source code from GitHub.
 
-Selenium Tests: Executes 4 functional validations using a headless Firefox browser.
+2. **Deploy to Tomcat**  
+   Automatically deploys `index.jsp` to:  
+   `/var/lib/tomcat9/webapps/`
 
-Load Test: Simulates 27 concurrent users over 3 minutes to verify stability.
+3. **External Monitoring Status**  
+   Queries the **UptimeRobot API** to ensure the public endpoint is reachable.
 
-Stress Test: Ramps up to 70 concurrent users to identify the system's breaking point.
+4. **Automated Quality Tests**  
+   Conditional execution:
+   - Skips heavy tests during routine 5-minute cron checks  
+   - Runs full test suite on SCM changes or manual triggers
 
-📊 Testing Strategy
-Selenium UI Validations
-We implemented 4 Hard Assertions to enforce a Fail-Fast methodology:
+   **Test Phases:**
+   - **Selenium Tests:** 4 functional UI validations (headless Firefox)
+   - **Load Test:** 27 concurrent users over 3 minutes
+   - **Stress Test:** Ramp-up to 70 concurrent users to detect breaking point
 
-Verify Header (h1): Confirms the page identity ("DevOps Project").
+---
 
-Verify Welcome Message (h2): Ensures static JSP content is rendered correctly.
+## 📊 Testing Strategy
 
-Verify Result Box: Confirms the server-side logic displays the output container after submission.
+### Selenium UI Validations
 
-Verify Data Integrity: Matches the exact submitted string ("DevOpsProject") against the displayed output.
+Implemented **4 Hard Assertions** using Fail-Fast methodology:
 
-Performance Benchmarking (Gatling)
-Load Simulation: Ramps from 1 to 27 users in 30 seconds, maintaining steady pressure for 3 minutes.
+- **Header Verification (h1)**  
+  Confirms page identity: `"DevOps Project"`
 
-Stress Simulation: Linear ramp-up to 70 users over 3 minutes to determine maximum throughput.
+- **Welcome Message (h2)**  
+  Ensures static JSP content renders correctly
 
-Quality Gates: The pipeline fails if the success rate drops below 90% or if response times exceed defined thresholds.
+- **Result Box Validation**  
+  Confirms server-side logic displays output container after submission
 
-📋 Prerequisites & Configuration
-To replicate this environment, ensure the following are configured:
+- **Data Integrity Check**  
+  Matches submitted string `"DevOpsProject"` against displayed output
 
-Jenkins Plugins: NodeJS, Maven, Gatling, and Pipeline.
+---
 
-Credentials: A Jenkins secret string named uptimerobot-api-key.
+### Performance Benchmarking (Gatling)
 
-Environment: A Linux server with Tomcat 9 and a public IP address.
+**Load Simulation**
+- Ramp from 1 → 27 users in 30 seconds  
+- Maintain steady load for 3 minutes  
 
-Authors: Adam, Liad, Adir, Amit, Yuri.
+**Stress Simulation**
+- Linear ramp-up to 70 users over 3 minutes  
+
+**Quality Gates**
+- Pipeline fails if:
+  - Success rate < **90%**
+  - Response time exceeds defined thresholds
+
+---
+
+## 📋 Prerequisites & Configuration
+
+To replicate this environment:
+
+**Jenkins Plugins**
+- NodeJS  
+- Maven  
+- Gatling  
+- Pipeline  
+
+**Credentials**
+- Jenkins Secret Text: `uptimerobot-api-key`
+
+**Environment**
+- Linux server  
+- Apache Tomcat 9  
+- Public IP address  
+
+---
+
+## 👥 Authors
+
+Adam  
+Liad  
+Adir  
+Amit  
+Yuri  
+
+---
