@@ -22,7 +22,7 @@ class Stress3Min extends Simulation {
       rampConcurrentUsers(1).to(70).during(3.minutes)
     )
   ).protocols(httpProtocol)
-   // --- Assertions לבדיקת ה-Stress ---
+   // --- Assertions Stress ---
    .assertions(
      global.successfulRequests.percent.gt(90), // Fail if less than 90% requests succeed
      global.responseTime.mean.lt(20000)         // Fail if response time is more than 20 seconds
