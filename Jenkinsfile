@@ -63,7 +63,7 @@ pipeline {
             }
         }
 
-        // --- Heavy Testing Block ---
+        // ---- Heavy Testing Block ----
         // These stages run ONLY on Code Change or Manual Build to prevent server crash loops
         stage('Automated Quality Tests') {
             when {
