@@ -15,12 +15,12 @@ class Load3Min extends Simulation {
         .get("/Devops-final-project-/adamliadadiramityuri/")
         .check(status.is(200))
     )
-    .pause(300.millis, 900.millis)
-
+    .pause(300.millis, 900.millis) // 
+ 
   setUp(
     scn.inject(
-      rampConcurrentUsers(1).to(30).during(30.seconds),
-      constantConcurrentUsers(30).during(3.minutes)
+      rampConcurrentUsers(1).to(27).during(30.seconds),
+      constantConcurrentUsers(27).during(3.minutes) 
     )
   ).protocols(httpProtocol)
    // --- Assertions ---
